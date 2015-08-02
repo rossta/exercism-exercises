@@ -1,5 +1,5 @@
 class Hamming
-  VERSION = 1
+  VERSION = 2
 
   def self.compute(left, right)
     raise ArgumentError unless left.length == right.length
