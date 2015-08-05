@@ -4,11 +4,11 @@ class Squares
   end
 
   def square_of_sums
-    square.call sum(sequence)
+    square sum(sequence)
   end
 
   def sum_of_squares
-    sum sequence.map(&square)
+    sum sequence.map(&method(:square))
   end
 
   def difference
@@ -25,7 +25,7 @@ class Squares
     seq.reduce(&:+)
   end
 
-  def square
-    ->(n) { n * n }
+  def square(n)
+    n * n
   end
 end
