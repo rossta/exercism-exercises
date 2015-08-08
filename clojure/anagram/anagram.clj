@@ -10,8 +10,5 @@
     (and (not= c d)
          (= (sort c) (sort d)))))
 
-(defn- anagram-for? [a]
-  (fn [b] (anagrams? a b)))
-
 (defn anagrams-for [text candidates]
-  (filter (anagram-for? text) candidates))
+  (filter (partial anagrams? text) candidates))
