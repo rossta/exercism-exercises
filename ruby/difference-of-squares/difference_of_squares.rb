@@ -3,29 +3,19 @@ class Squares
     @num = num
   end
 
+  # Based on formula:
+  # http://www.trans4mind.com/personal_development/mathematics/series/sumNaturalNumbers.htm
   def square_of_sums
-    square sum(sequence)
+    (@num * (@num + 1) / 2) ** 2
   end
 
+  # Given by formula:
+  # http://www.trans4mind.com/personal_development/mathematics/series/sumNaturalSquares.htm
   def sum_of_squares
-    sum sequence.map(&method(:square))
+    (@num * (@num + 1) * (2 * @num + 1)) / 6
   end
 
   def difference
     square_of_sums - sum_of_squares
-  end
-
-  private
-
-  def sequence
-    (1..@num)
-  end
-
-  def sum(seq)
-    seq.reduce(&:+)
-  end
-
-  def square(n)
-    n * n
   end
 end
