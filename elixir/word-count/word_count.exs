@@ -1,4 +1,3 @@
-require IEx
 defmodule Words do
   @doc """
   Count the number of words in the sentence.
