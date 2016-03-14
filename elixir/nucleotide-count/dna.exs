@@ -1,5 +1,7 @@
 defmodule DNA do
   @nucleotides [?A, ?C, ?G, ?T]
+  @empty_histogram @nucleotides |>
+    Enum.reduce(%{}, fn(nuc, histo) -> Map.put(histo, nuc, 0) end)
 
   @doc """
   Counts individual nucleotides in a DNA strand.
@@ -13,12 +15,12 @@ defmodule DNA do
   1
   """
   @spec count([char], char) :: non_neg_integer
-  def count(strand, nucleotide) do
-    assert_valid_strand([nucleotide])
+  def count(_, nuc) when not nuc in @nucleotides,
+    do: raise ArgumentError
+  def count(strand, nuc) when nuc in @nucleotides do
     strand
-    |> assert_valid_strand
-    |> Enum.filter(fn(char) -> char == nucleotide end)
-    |> length
+    |> histogram
+    |> Map.get(nuc)
   end
 
   @doc """
@@ -30,25 +32,11 @@ defmodule DNA do
   %{?A => 4, ?T => 1, ?C => 0, ?G => 0}
   """
   @spec histogram([char]) :: Map
-  def histogram(strand) do
-    strand
-    |> assert_valid_strand
-    |> Enum.reduce(empty_histogram, &count_nucleotide/2)
-  end
-
-  defp empty_histogram do
-    'ATCG' |>
-    Enum.reduce(%{}, fn(nuc, histo) -> Map.put(histo, nuc, 0) end)
-  end
-
-  defp count_nucleotide(nucleotide, histogram) do
-    Map.update!(histogram, nucleotide, &(&1 + 1))
-  end
-
-  defp assert_valid_strand(strand) do
-    cond do
-      Regex.match?(~r/^[A|T|C|G]*$/, to_string(strand)) -> strand
-      true -> raise ArgumentError, message: "invalid argument #{strand}"
-    end
+  def histogram(strand), do: histogram(strand, @empty_histogram)
+  defp histogram([], dict), do: dict
+  defp histogram([nuc|_], _) when not nuc in @nucleotides,
+    do: raise ArgumentError
+  defp histogram([nuc|tail], dict) do
+    histogram(tail, Map.update!(dict, nuc, &(&1 + 1)))
   end
 end
