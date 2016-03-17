@@ -14,8 +14,8 @@ defmodule Meetup do
   }
 
   @type weekday ::
-      :monday | :tuesday | :wednesday
-    | :thursday | :friday | :saturday | :sunday
+  :monday | :tuesday | :wednesday
+  | :thursday | :friday | :saturday | :sunday
 
   @type schedule :: :first | :second | :third | :fourth | :last | :teenth
 
@@ -31,8 +31,7 @@ defmodule Meetup do
   end
 
   defp day(year, month, weekday, schedule) do
-    last_day(year, month, schedule)
-    |> day_range
+    schedule_day_range(year, month, schedule)
     |> Enum.map(fn(day) ->
       { :calendar.day_of_the_week(year, month, day), day }
     end)
@@ -40,13 +39,16 @@ defmodule Meetup do
     |> Map.get(Map.get(@weekdays, weekday))
   end
 
-  defp last_day(_,_,:teenth), do: 19
-  defp last_day(_,_,:first), do: 7
-  defp last_day(_,_,:second), do: 14
-  defp last_day(_,_,:third), do: 21
-  defp last_day(_,_,:fourth), do: 28
-  defp last_day(year, month, :last),
-    do: :calendar.last_day_of_the_month(year, month)
+  defp schedule_day_range(year, month, schedule) do
+    last_day_in_schedule = case schedule do
+      :first -> 7
+      :second -> 14
+      :teenth -> 19
+      :third -> 21
+      :fourth -> 28
+      :last -> :calendar.last_day_of_the_month(year, month)
+    end
 
-  defp day_range(last_day), do: (last_day-6)..last_day
+    (last_day_in_schedule-6)..last_day_in_schedule
+  end
 end
