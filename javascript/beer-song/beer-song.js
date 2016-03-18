@@ -1,5 +1,14 @@
 var BeerSong = function() {};
 
+BeerSong.prototype.sing = function(startCount, endCount) {
+  endCount = endCount || 0;
+  var firstVerse = this.verse(startCount);
+  if (startCount > endCount) {
+    return firstVerse + "\n" + this.sing(startCount-1, endCount);
+  }
+  return firstVerse;
+}
+
 BeerSong.prototype.verse = function(count) {
   var lines = [];
   lines.push(phraseStartVerse(count));
@@ -38,18 +47,20 @@ function phraseOneBottle(count) {
 }
 
 function phraseNumberOfBottles(count) {
-  var howMany;
+  var howMany = phraseBottleCount(count);
   var bottles = pluralize("bottle", count);
 
-  if (count < 0) {
-    howMany = 99;
-  } else if (count) {
-    howMany = count;
-  } else {
-    howMany = "no more";
-  }
-
   return howMany + " " + bottles + " of beer";
+}
+
+function phraseBottleCount(count) {
+  if (count < 0) {
+    return 99;
+  } else if (count) {
+    return count;
+  } else {
+    return "no more";
+  }
 }
 
 function pluralize(text, count) {
