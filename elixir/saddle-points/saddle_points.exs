@@ -33,27 +33,38 @@ defmodule Matrix do
   """
   @spec saddle_points(String.t()) :: [{integer, integer}]
   def saddle_points(str) do
-    max_matrix = str |> rows |> Enum.map(&max_row/1)
-    min_matrix = str |> columns |> Enum.map(&min_row/1) |> transpose
-
-    Enum.zip(max_matrix, min_matrix)
-    |> Enum.map(fn({maxs, mins}) -> max_min_row(maxs, mins) end)
-    |> Stream.with_index
-    |> Stream.filter(fn({min_max, i}) -> Enum.any?(min_max) end)
-    |> Stream.map(fn({min_max, i}) -> {i, Enum.find_index(min_max, &(&1 == true))} end)
-    |> Enum.to_list
+    Enum.zip(max_matrix(str), min_matrix(str))
+    |> Enum.map(&collapse_max_min_row_tuples/1)
+    |> Enum.with_index
+    |> Enum.filter(&max_min_row?/1)
+    |> Enum.map(&min_max_row_to_saddle_point/1)
   end
 
-  defp min_row(row) do
-    Enum.map(row, fn(el) -> el == Enum.min(row) end)
+  defp min_matrix(str) do
+    str
+    |> columns
+    |> Enum.map(&(Enum.map(&1, fn(el) -> el == Enum.min(&1) end)))
+    |> transpose
   end
 
-  defp max_row(row) do
-    Enum.map(row, fn(el) -> el == Enum.max(row) end)
+  defp max_matrix(str) do
+    str
+    |> rows
+    |> Enum.map(&(Enum.map(&1, fn(el) -> el == Enum.max(&1) end)))
   end
 
-  def max_min_row([], []), do: []
-  def max_min_row([is_max|maxs], [is_min|mins]) do
-    [is_max && is_min] ++ max_min_row(maxs, mins)
+  def collapse_max_min_row_tuples({maxs, mins}) do
+    to_max_min_row(maxs, mins)
   end
+
+  defp to_max_min_row([], []), do: []
+  defp to_max_min_row([is_max|maxs], [is_min|mins]) do
+    [is_max && is_min] ++ to_max_min_row(maxs, mins)
+  end
+
+  defp min_max_row_to_saddle_point({min_max, i}) do
+    {i, Enum.find_index(min_max, &(&1 == true))}
+  end
+
+  defp max_min_row?({min_max, _}), do: Enum.any?(min_max)
 end
