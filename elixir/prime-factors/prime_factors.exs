@@ -15,7 +15,7 @@ defmodule PrimeFactors do
   end
 
   defp smallest_prime_factor(number) do
-    Stream.unfold(2, fn(n) -> {n, n+1} end)
+    Stream.unfold(2, &({&1, &1+1}))
     |> Stream.filter(&(prime_factor? number, &1))
     |> Enum.take(1)
   end
