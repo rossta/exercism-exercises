@@ -24,8 +24,7 @@ defmodule Queens do
     |> List.replace_at(linear_position(queens.white), "W")
     |> List.replace_at(linear_position(queens.black), "B")
     |> Enum.chunk(8)
-    |> Enum.map(&(Enum.join(&1, " ")))
-    |> Enum.join("\n")
+    |> Enum.map_join("\n", &(Enum.join(&1, " ")))
   end
 
   defp linear_position({row, column}), do: (row * 8) + column
@@ -36,10 +35,6 @@ defmodule Queens do
   @spec can_attack?(Queens.t()) :: boolean
   def can_attack?(%Queens{white: {row, _}, black: {row, _}}), do: true
   def can_attack?(%Queens{white: {_, col}, black: {_, col}}), do: true
-  def can_attack?(%Queens{white: {row1, col1}, black: {row2, col2}}) do
-    row_diff = row1 - row2
-    col_diff = col1 - col2
-    row_diff == col_diff || row_diff == -col_diff
-  end
-  def can_attack?(%Queens{white: {_, _}, black: {_, _}}), do: false
+  def can_attack?(%Queens{white: {row1, col1}, black: {row2, col2}}),
+    do: abs(row1 - row2) == abs(col1 - col2)
 end
