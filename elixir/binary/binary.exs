@@ -14,9 +14,6 @@ defmodule Binary do
   end
 
   defp bit_sum([?0 | tail]), do: bit_sum(tail)
-  defp bit_sum([?1 | tail]), do: power(length(tail)) + bit_sum(tail)
+  defp bit_sum([?1 | tail]), do: :math.pow(2, length(tail)) + bit_sum(tail)
   defp bit_sum(_), do: 0
-
-  defp power(0), do: 1
-  defp power(num), do: 2 * power(num - 1)
 end
