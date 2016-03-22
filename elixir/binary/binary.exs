@@ -6,11 +6,9 @@ defmodule Binary do
   """
   @spec to_decimal(String.t) :: non_neg_integer
   def to_decimal(string) do
-    if Regex.match?(~r/^[0|1]*$/, string) do
-      string |> String.to_char_list |> bit_sum
-    else
-      0
-    end
+    Regex.replace(~r/^.*\p{L}.*$/, string, "")
+    |> String.to_char_list
+    |> bit_sum
   end
 
   defp bit_sum([?0 | tail]), do: bit_sum(tail)
