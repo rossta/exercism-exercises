@@ -18,6 +18,8 @@ defmodule Scrabble do
     |> String.replace(~r/\s+/, "")
     |> String.downcase
     |> to_char_list
-    |> Enum.reduce(0, fn(c, sum) -> @scores[c] + sum end)
+    |> score(0)
   end
+  def score([], sum), do: sum
+  def score([head | tail], sum), do: score(tail, sum + @scores[head])
 end
