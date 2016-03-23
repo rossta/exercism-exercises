@@ -80,11 +80,7 @@ FoodChain.prototype.verse = function(num) {
     }, []).join("\n") + '\n';
 };
 
-function singleVerse(num) {
-}
-
 function verseParts(num) {
-  if (num > CHAIN.length) { throw 'Can\'t sing that verse ('+num+')'; }
   if (num == CHAIN.length) {
     return CHAIN.slice(0, 1);
   } else {
@@ -92,10 +88,10 @@ function verseParts(num) {
   }
 }
 
-function animalVerse(leads, closings) {
+function animalVerse(openings, closings) {
   return function(parts, secondary) {
     if (!secondary) {
-      leads.forEach(function(part) { parts.push(part); });
+      openings.forEach(function(part) { parts.push(part); });
     }
     closings.forEach(function(part) { parts.push(part); });
     return parts;
