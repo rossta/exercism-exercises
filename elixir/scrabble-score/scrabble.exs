@@ -18,8 +18,8 @@ defmodule Scrabble do
     |> String.replace(~r/\s+/, "")
     |> String.downcase
     |> to_char_list
-    |> score(0)
+    |> do_score(0)
   end
-  def score([], sum), do: sum
-  def score([head | tail], sum), do: score(tail, sum + @scores[head])
+  defp do_score([], sum), do: sum
+  defp do_score([head | tail], sum), do: do_score(tail, sum + @scores[head])
 end
