@@ -9,31 +9,13 @@ defmodule PrimeFactors do
   """
   @spec factors_for(pos_integer) :: [pos_integer]
   def factors_for(1), do: []
-  def factors_for(number) do
-    [prime] = smallest_prime_factor(number)
-    [prime] ++ factors_for(div(number, prime))
+  def factors_for(n) do
+    factors_for(n, 2)
   end
 
-  defp smallest_prime_factor(number) do
-    Stream.unfold(2, &({&1, &1+1}))
-    |> Stream.filter(&(prime_factor? number, &1))
-    |> Enum.take(1)
+  def factors_for(n, factor) when rem(n, factor) == 0 do
+    [factor | factors_for(div(n, factor))]
   end
-
-  defp prime_factor?(number, candidate) do
-    rem(number, candidate) == 0 && prime?(candidate)
-  end
-
-  def prime?(number) do
-    all_factors(number) == [1]
-  end
-
-  defp all_factors(number) do
-    all_factors(number, round(:math.sqrt(number)))
-  end
-  defp all_factors(number, 1), do: [1]
-  defp all_factors(number, divisor) when rem(number, divisor) == 0 do
-    [divisor|all_factors(number, divisor-1)]
-  end
-  defp all_factors(number, divisor), do: all_factors(number, divisor-1)
+  def factors_for(n, 2), do: factors_for(n, 3)
+  def factors_for(n, factor), do: factors_for(n, factor + 2)
 end
