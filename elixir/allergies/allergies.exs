@@ -25,7 +25,6 @@ defmodule Allergies do
   def allergic_to?(flags, item) do
     flags
     |> list
-    |> Enum.into(HashSet.new)
-    |> Set.member?(item)
+    |> Enum.any?(&(&1 == item))
   end
 end
