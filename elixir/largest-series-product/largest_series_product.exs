@@ -12,25 +12,12 @@ defmodule Series do
     number_string
     |> String.split("", trim: true)
     |> Enum.map(&String.to_integer/1)
-    |> max_cons_product(size, 0)
+    |> Enum.chunk(size, 1)
+    |> Enum.map(&product/1)
+    |> Enum.max
   end
 
-  defp max_cons_product([], size, max), do: max
-  defp max_cons_product(numbers, size, max) do
-    cons(numbers, size)
-    |> Enum.reduce(max, &calculate_max/2)
+  defp product(numbers) do
+    Enum.reduce(numbers, &(&1 * &2))
   end
-
-  defp calculate_max(numbers, max) do
-    product = Enum.reduce(numbers, &(&1 * &2))
-    if product > max do
-      product
-    else
-      max
-    end
-  end
-
-  defp cons(list, count) when length(list) < count, do: []
-  defp cons([_ | tail] = list, count),
-    do: [Enum.take(list, count) | cons(tail, count)]
 end
