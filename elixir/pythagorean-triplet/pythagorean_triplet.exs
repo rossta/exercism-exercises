@@ -30,8 +30,8 @@ defmodule Triplet do
   @spec generate(non_neg_integer, non_neg_integer) :: [list(non_neg_integer)]
   def generate(max), do: generate(1, max)
   def generate(min, max) do
-    Stream.iterate(min, &(&1+1))
-    |> Stream.flat_map(&({&1, &1 + 1, &1 + 1}))
+    generate_tuples(min, max)
+    |> Enum.map(&Tuple.to_list/1)
   end
 
   @doc """
@@ -39,6 +39,16 @@ defmodule Triplet do
   """
   @spec generate(non_neg_integer, non_neg_integer, non_neg_integer) :: [list(non_neg_integer)]
   def generate(min, max, sum) do
+    generate(min, max)
+    |> Enum.filter(fn([a, b, c]) -> a+b+c == sum end)
+  end
 
+  defp generate_tuples(min, max) do
+    for a <- (min..max-2),
+        b <- (min+1..max-1),
+        c <- (min+2..max),
+        a < b && b < c,
+        a*a + b*b == c*c,
+        do: {a, b, c}
   end
 end
