@@ -46,7 +46,7 @@ defmodule Zipper do
   Get the left child of the focus node, if any.
   """
   @spec left(Z.t) :: Z.t | nil
-  def left({%BinTree{left: nil}, _}), do: nil
+  def left({%{left: nil}, _}), do: nil
   def left({tree, trail}) do
     {tree.left, [{:left, tree.value, tree.right} | trail]}
   end
