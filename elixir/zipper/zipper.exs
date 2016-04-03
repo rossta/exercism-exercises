@@ -38,8 +38,8 @@ defmodule Zipper do
   Get the value of the focus node.
   """
   @spec value(Z.t) :: any
-  def value({tree, trail}) do
-    tree.value
+  def value({%{value: value}, trail}) do
+    value
   end
 
   @doc """
@@ -47,17 +47,17 @@ defmodule Zipper do
   """
   @spec left(Z.t) :: Z.t | nil
   def left({%{left: nil}, _}), do: nil
-  def left({tree, trail}) do
-    {tree.left, [{:left, tree.value, tree.right} | trail]}
+  def left({%{right: right, value: value, left: left}, trail}) do
+    {left, [{:left, value, right} | trail]}
   end
 
   @doc """
   Get the right child of the focus node, if any.
   """
   @spec right(Z.t) :: Z.t | nil
-  def left({%{right: nil}, _}), do: nil
-  def right({tree, trail}) do
-    {tree.right, [{ :right, tree.value, tree.left } | trail]}
+  def right({%{right: nil}, _}), do: nil
+  def right({%{right: right, value: value, left: left}, trail}) do
+    {right, [{ :right, value, left } | trail]}
   end
 
   @doc """
@@ -77,7 +77,7 @@ defmodule Zipper do
   """
   @spec set_value(Z.t, any) :: Z.t
   def set_value({tree, trail}, value) do
-    {%BinTree{value: value, left: tree.left, right: tree.right}, trail}
+    {%BinTree{tree | value: value}, trail}
   end
 
   @doc """
@@ -85,7 +85,7 @@ defmodule Zipper do
   """
   @spec set_left(Z.t, BT.t) :: Z.t
   def set_left({tree, trail}, left) do
-    {%BinTree{value: tree.value, left: left, right: tree.right}, trail}
+    {%BinTree{tree | left: left}, trail}
   end
 
   @doc """
@@ -93,6 +93,6 @@ defmodule Zipper do
   """
   @spec set_right(Z.t, BT.t) :: Z.t
   def set_right({tree, trail}, right) do
-    {%BinTree{value: tree.value, left: tree.left, right: right}, trail}
+    {%BinTree{tree | right: right}, trail}
   end
 end
