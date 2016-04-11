@@ -17,7 +17,7 @@ defmodule Connect do
   defp winner?(board, piece) do
     board
     |> Enum.with_index
-    |> Enum.any?(fn {[first|_] = row_pieces, row} ->
+    |> Enum.any?(fn {[first|_], row} ->
       first == piece && winner?(board, piece, [{row, 0}])
     end)
   end
@@ -25,7 +25,8 @@ defmodule Connect do
   defp winner?(board, piece, [{_, col} | _]) when col == length(hd board) - 1,
     do: true
   defp winner?(board, piece, [{row, col} | _] = path) do
-    neighbors(row, col, board, path)
+    neighbors(row, col, board)
+    |> Enum.filter(&(!&1 in path))
     |> Enum.filter(&(get_piece(board, &1) == piece))
     |> Enum.any?(&winner?(board, piece, [&1 | path]))
   end
@@ -40,13 +41,12 @@ defmodule Connect do
     |> Enum.map(&Tuple.to_list/1)
   end
 
-  defp neighbors(row, col, board, path) do
+  defp neighbors(row, col, board) do
     for a <- (row-1)..(row+1),
         b <- (col-1)..(col+1),
         a >= 0 && b >= 0,
-        (a < length(board) && b < length(hd(board))),
+        a < length(board) && b < length(hd(board)),
         !(a == row && b == col),
-        !({a, b} in path),
         do: {a, b}
   end
 end
