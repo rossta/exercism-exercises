@@ -5,39 +5,33 @@ defmodule Connect do
   and "X" as the black player
   """
   @spec result_for([String.t]) :: :none | :black | :white
-  def result_for(board) do
-    graphemes = board |> Enum.map(&String.graphemes/1)
+  def result_for(string_board) do
+    board = string_board |> Enum.map(&String.graphemes/1)
     cond do
-      winner?(graphemes, "O") -> :white
-      winner?((graphemes |> transpose), "X") -> :black
+      winner?((board |> transpose), "O") -> :white
+      winner?(board, "X") -> :black
       true -> :none
     end
   end
 
-  defp winner?(graphemes, piece) do
-    map = graphemes |> to_board_map
-
-    [first | _] = graphemes
-
-    first
+  defp winner?(board, piece) do
+    board
     |> Enum.with_index
-    |> Enum.map(fn {val, col} -> {val, 0, col} end)
-    |> Enum.filter(fn {val, _, _} -> val == piece end)
-    |> Enum.any?(fn {val, row, col} ->
-      complete_path_for?({val, row, col},
-        map, piece, (length(graphemes)-1), [[row, col]])
+    |> Enum.any?(fn {[first|_] = row_pieces, row} ->
+      first == piece && winner?(board, piece, [{row, 0}])
     end)
   end
 
-  defp complete_path_for?(_location,
-    _map, _piece, finish_row, [[finish_row, _]|_]), do: true
+  defp winner?(board, piece, [{_, col} | _]) when col == length(hd board) - 1,
+    do: true
+  defp winner?(board, piece, [{row, col} | _] = path) do
+    neighbors(row, col, board, path)
+    |> Enum.filter(&(get_piece(board, &1) == piece))
+    |> Enum.any?(&winner?(board, piece, [&1 | path]))
+  end
 
-  defp complete_path_for?({ _val, row, col }, map, piece, finish, path) do
-    neighbors(row, col, map, path)
-    |> Enum.filter(fn {val, _, _} -> val == piece end)
-    |> Enum.any?(fn {val, row, col} ->
-      complete_path_for?({val, row, col}, map, piece, finish, [[row, col] | path])
-    end)
+  defp get_piece(board, {row, col}) do
+    board |> Enum.at(row) |> Enum.at(col)
   end
 
   defp transpose(board) do
@@ -46,27 +40,13 @@ defmodule Connect do
     |> Enum.map(&Tuple.to_list/1)
   end
 
-  defp to_board_map(board) do
-    board
-    |> Enum.with_index
-    |> Enum.reduce(%{}, fn({board_row, row_index}, row_map) ->
-      cols = board_row
-      |> Enum.with_index
-      |> Enum.reduce(%{}, fn({char, col_index}, col_map) ->
-        Map.put(col_map, col_index, char)
-      end)
-      Map.put(row_map, row_index, cols)
-    end)
-  end
-
-  defp neighbors(row, col, map, path) do
-    candidates = for a <- (row-1)..(row+1),
-          b <- (col-1)..(col+1),
-          !(a == row && b == col), do: [a, b]
-
-    candidates
-    |> Enum.filter(fn(coord) -> !Enum.member?(path, coord) end)
-    |> Enum.map(fn(coord) -> [get_in(map, coord) | coord] end)
-    |> Enum.map(&List.to_tuple/1)
+  defp neighbors(row, col, board, path) do
+    for a <- (row-1)..(row+1),
+        b <- (col-1)..(col+1),
+        a >= 0 && b >= 0,
+        (a < length(board) && b < length(hd(board))),
+        !(a == row && b == col),
+        !({a, b} in path),
+        do: {a, b}
   end
 end
