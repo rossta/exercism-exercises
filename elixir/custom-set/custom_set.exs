@@ -10,59 +10,54 @@ defmodule CustomSet do
 
   def new, do: %CustomSet{}
   def new(enum) do
-    list = enum
-    |> Enum.map(&({&1, nil}))
-    |> Enum.into(%{})
-    |> Map.keys()
-
-    %CustomSet{list: list}
+    %CustomSet{list: enum |> Enum.uniq |> Enum.sort}
   end
 
-  def delete(%{list: list}, item) do
-    list |> Enum.filter(&(&1 !== item)) |> new
+  def delete(set, item) do
+    set.list -- [item] |> new
   end
 
-  def equal?(%{list: list1}, %{list: list2}) do
-    Enum.sort(list1) == Enum.sort(list2)
+  def equal?(set1, set2) do
+    set1.list == set2.list
   end
 
-  def difference(%{list: list}, other) do
-    list |> Enum.filter(&(!member?(other, &1))) |> new
+  def difference(set, other) do
+    set.list |> Enum.filter(&(!member?(other, &1))) |> new
   end
 
-  def disjoint?(%{list: list}, other) do
-    list |> Enum.all?(&(!member?(other, &1)))
+  def disjoint?(set, other) do
+    set.list |> Enum.all?(&(!member?(other, &1)))
   end
 
   def empty(set) do
     new
   end
 
-  def intersection(%{list: list}, other) do
-    list |> Enum.filter(&(member?(other, &1))) |> new
+  def intersection(set, other) do
+    set.list |> Enum.filter(&(member?(other, &1))) |> new
   end
 
-  def member?(%{list: list}, value) do
-    list |> Enum.member?(value)
+  def member?(set, value) do
+    set.list |> Enum.member?(value)
   end
 
-  def put(%{list: list}, value) do
-    new([value | list])
+  def put(set, value) do
+    [value | set.list] |> new
   end
 
-  def size(%{list: list}) do
-    length(list)
+  def size(set) do
+    set.list |> length
   end
 
-  def subset?(%{list: list}, other) do
-    list |> Enum.all?(&(member?(other, &1)))
+  def subset?(set, other) do
+    set.list |> Enum.all?(&(member?(other, &1)))
   end
 
-  def to_list(%{list: list}) do
-    list
+  def to_list(set) do
+    set.list
   end
 
-  def union(%{list: list1}, %{list: list2}) do
-    new(list1 ++ list2)
+  def union(set, other) do
+    set.list ++ other.list |> new
   end
 end
