@@ -1,4 +1,6 @@
 class Robot
+  @@mutex = Mutex.new
+  @@used_names = {}
 
   ALPHABET = "A".upto("Z").to_a
   DIGITS = 0.upto(9).to_a
@@ -6,13 +8,17 @@ class Robot
   attr_reader :name
 
   def initialize
-    @used_names = []
-    @name = generate_name
+    reset
   end
 
   def reset
-    @used_names << @name
-    @name = generate_name while @used_names.include?(@name)
+    @@mutex.synchronize {
+      loop do
+        @name = generate_name
+        break unless @@used_names.include?(@name)
+      end
+      @@used_names[@name] = true
+    }
   end
 
   private
