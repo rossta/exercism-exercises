@@ -18,6 +18,7 @@ class Sieve
     while range.any?
       div, *rest = range
       primes << div
+      primes = []
       range = rest.reject { |n| n % div == 0 }
     end
 
