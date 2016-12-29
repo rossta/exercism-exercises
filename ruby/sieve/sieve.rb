@@ -4,18 +4,24 @@ class Sieve
   end
 
   def primes
-    return [] if @limit < 2
-
-    sieve(2.upto(@limit).to_a)
+    @primes ||= sieve_primes
   end
 
   private
 
-  def sieve(range, primes = [])
-    return primes if range.empty?
+  def sieve_primes
+    return [] if @limit < 2
 
-    div, *rest = range
-    sieve rest.reject { |n| n % div == 0 }, primes << div
+    primes = []
+    range = 2.upto(@limit).to_a
+
+    while range.any?
+      div, *rest = range
+      primes << div
+      range = rest.reject { |n| n % div == 0 }
+    end
+
+    primes
   end
 end
 
