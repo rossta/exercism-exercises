@@ -4,8 +4,6 @@ class Hamming
   def self.compute(left, right)
     raise ArgumentError unless left.length == right.length
 
-    char_pairs = left.chars.zip(right.chars)
-
-    char_pairs.keep_if { |(a, b)| a != b }.count
+    left.each_char.with_index.count { |a, i| a != right[i] }
   end
 end
