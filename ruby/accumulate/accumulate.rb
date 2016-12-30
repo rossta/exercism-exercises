@@ -1,5 +1,7 @@
 class Array
   def accumulate
+    return to_enum(:accumulate) unless block_given?
+
     arr = []
     i = 0
     while i < self.length
