@@ -1,49 +1,33 @@
 class PhoneNumberNormalizer
-  REQUIRED_LENGTH = 10
-  INVALID_CHARACTER_MATCH = %r{[^-\.\(\)\s\d]+}
-  NON_NUMBER_MATCH = %r{[^\d]}
-  VALID_EXTERNAL_MATCH = %r{^1(\d{10})}
+  VALID_LENGTH = 10
+  NON_ALPHANUMERIC_MATCH = /[^\w]+/
+  VALID_DIGIT_MATCH = /^1?\d{#{VALID_LENGTH}}$/
 
   def normalize(input)
-    return fallback_number if invalid_characters?(input)
-
-    number = normalize_digits(input)
-
-    return fallback_number if invalid_length?(number)
-
-    normalize_external_number(number)
+    normalize_input(input) or fallback_number
   end
 
   private
 
+  def normalize_input(input)
+    input = input.gsub(NON_ALPHANUMERIC_MATCH, "")
+
+    return nil if !valid_digits?(input)
+
+    normalize_valid_digits(input)
+  end
+
+  def normalize_valid_digits(input)
+    start = input.length - VALID_LENGTH
+    input[start..-1]
+  end
+
   def fallback_number
-    '0' * REQUIRED_LENGTH
+    '0' * VALID_LENGTH
   end
 
-  def normalize_external_number(input)
-    input.gsub(VALID_EXTERNAL_MATCH, '\1')
-  end
-
-  def invalid_characters?(input)
-    input =~ INVALID_CHARACTER_MATCH
-  end
-
-  def normalize_digits(input)
-    input.gsub(NON_NUMBER_MATCH, "")
-  end
-
-  def valid_external_number?(input)
-    input.length == REQUIRED_LENGTH + 1 &&
-      external_number?(input)
-  end
-
-  def external_number?(input)
-    input.start_with?("1")
-  end
-
-  def invalid_length?(input)
-    input.length != REQUIRED_LENGTH &&
-      !valid_external_number?(input)
+  def valid_digits?(input)
+    input =~ VALID_DIGIT_MATCH
   end
 end
 
