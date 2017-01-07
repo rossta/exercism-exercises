@@ -7,4 +7,3 @@ helloWorld name =
         "Hello, World!"
     Just first ->
         "Hello, " ++ first ++ "!"
-
